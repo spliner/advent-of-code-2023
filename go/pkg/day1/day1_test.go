@@ -8,11 +8,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestParseCalibration(t *testing.T) {
-	type testCase struct {
-		input    string
-		expected int
-	}
+type testCase struct {
+	input    string
+	expected int
+}
+
+func TestParsePart1Calibration(t *testing.T) {
 	testCases := []testCase{
 		{
 			input:    "1abc2",
@@ -34,7 +35,7 @@ func TestParseCalibration(t *testing.T) {
 	for _, c := range testCases {
 		name := fmt.Sprintf("%s should return %d", c.input, c.expected)
 		t.Run(name, func(t *testing.T) {
-			calibration, err := parseCalibration(c.input)
+			calibration, err := parsePart1Calibration(c.input)
 			require.Nil(t, err)
 			assert.Equal(t, c.expected, calibration)
 		})
@@ -51,4 +52,60 @@ treb7uchet`
 
 	require.Nil(t, err)
 	assert.Equal(t, "142", result)
+}
+
+func TestPart2Calibration(t *testing.T) {
+	testCases := []testCase{
+		{
+			input:    "two1nine",
+			expected: 29,
+		},
+		{
+			input:    "eightwothree",
+			expected: 83,
+		},
+		{
+			input:    "abcone2threexyz",
+			expected: 13,
+		},
+		{
+			input:    "xtwone3four",
+			expected: 24,
+		},
+		{
+			input:    "4nineeightseven2",
+			expected: 42,
+		},
+		{
+			input:    "zoneight234",
+			expected: 14,
+		},
+		{
+			input:    "7pqrstsixteen",
+			expected: 76,
+		},
+	}
+	for _, c := range testCases {
+		name := fmt.Sprintf("%s should return %d", c.input, c.expected)
+		t.Run(name, func(t *testing.T) {
+			calibration, err := parsePart2Calibration(c.input)
+			require.Nil(t, err)
+			assert.Equal(t, c.expected, calibration)
+		})
+	}
+}
+
+func TestPart2(t *testing.T) {
+	input := `two1nine
+eightwothree
+abcone2threexyz
+xtwone3four
+4nineeightseven2
+zoneight234
+7pqrstsixteen`
+
+	result, err := Part2(input)
+
+	require.Nil(t, err)
+	assert.Equal(t, "281", result)
 }
