@@ -20,6 +20,19 @@ func NewGame(id int, subsets []Subset) *Game {
 	}
 }
 
+func (g *Game) MinSubset() Subset {
+	minSubset := make(map[string]int)
+	for _, s := range g.Subsets {
+		for color, count := range s {
+			current, ok := minSubset[color]
+			if !ok || count > current {
+				minSubset[color] = count
+			}
+		}
+	}
+	return minSubset
+}
+
 func Part1(input string) (string, error) {
 	lines := strings.Split(strings.TrimSpace(input), "\n")
 	var sum int
@@ -108,5 +121,33 @@ func parseGame(input string) (*Game, error) {
 }
 
 func Part2(input string) (string, error) {
-	return "", nil
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+	var sum int
+	for _, l := range lines {
+		game, err := parseGame(strings.TrimSpace(l))
+		if err != nil {
+			return "", err
+		}
+
+		minSubset := game.MinSubset()
+		power := 1
+		count, ok := minSubset["red"]
+		if ok {
+			power *= count
+		}
+
+		count, ok = minSubset["green"]
+		if ok {
+			power *= count
+		}
+
+		count, ok = minSubset["blue"]
+		if ok {
+			power *= count
+		}
+
+		sum += power
+	}
+
+	return strconv.Itoa(sum), nil
 }
