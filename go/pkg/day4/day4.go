@@ -2,6 +2,7 @@ package day4
 
 import (
 	"errors"
+	"math"
 	"strconv"
 	"strings"
 )
@@ -25,12 +26,7 @@ func (c *Card) Points() int {
 		return 0
 	}
 
-	points := 1
-	for i := 0; i < count-1; i++ {
-		points *= 2
-	}
-
-	return points
+	return int(math.Pow(2, float64(count-1)))
 }
 
 func Part1(input string) (string, error) {
