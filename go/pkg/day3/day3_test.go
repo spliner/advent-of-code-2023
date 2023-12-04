@@ -49,3 +49,21 @@ func TestPart1(t *testing.T) {
 	require.Nil(t, err)
 	assert.Equal(t, "4361", result)
 }
+
+func TestPart2(t *testing.T) {
+	input := `467..114..
+...*......
+..35..633.
+......#...
+617*......
+.....+.58.
+..592.....
+......755.
+...$.*....
+.664.598..`
+
+	result, err := Part2(input)
+
+	require.Nil(t, err)
+	assert.Equal(t, "467835", result)
+}
