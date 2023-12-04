@@ -14,6 +14,15 @@ type Card struct {
 }
 
 func (c *Card) Points() int {
+	count := c.CountMatches()
+	if count == 0 {
+		return 0
+	}
+
+	return int(math.Pow(2, float64(count-1)))
+}
+
+func (c *Card) CountMatches() int {
 	var count int
 	for _, n := range c.Numbers {
 		_, ok := c.Winners[n]
@@ -21,12 +30,7 @@ func (c *Card) Points() int {
 			count++
 		}
 	}
-
-	if count == 0 {
-		return 0
-	}
-
-	return int(math.Pow(2, float64(count-1)))
+	return count
 }
 
 func Part1(input string) (string, error) {
@@ -108,5 +112,30 @@ func parseLine(line string) (*Card, error) {
 }
 
 func Part2(input string) (string, error) {
-	return "", nil
+	lines := strings.Split(strings.TrimSpace(input), "\n")
+	quantities := make([]int, len(lines))
+	for i := range quantities {
+		quantities[i] = 1
+	}
+
+	for i, l := range lines {
+		card, err := parseLine(strings.TrimSpace(l))
+		if err != nil {
+			return "", err
+		}
+
+		matches := card.CountMatches()
+		for j := 0; j < matches; j++ {
+			index := i + j + 1
+			quantities[index] = quantities[index] + quantities[i]
+		}
+	}
+
+	var sum int
+	for _, q := range quantities {
+		sum += q
+	}
+
+	result := strconv.Itoa(sum)
+	return result, nil
 }
