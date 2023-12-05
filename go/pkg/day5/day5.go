@@ -28,7 +28,7 @@ func (l *MapLine) Destination(source int) (int, bool) {
 	}
 
 	diff := source - l.SourceStart
-	if diff > l.Length {
+	if diff > l.Length-1 {
 		return 0, false
 	}
 
@@ -216,5 +216,39 @@ func parseMap(scanner *bufio.Scanner) (*Map, error) {
 }
 
 func Part2(scanner *bufio.Scanner) (string, error) {
-	return "", nil
+	almanac, err := parseAlmanac(scanner)
+	if err != nil {
+		return "", err
+	}
+
+	pairCount := len(almanac.Seeds) / 2
+	minChan := make(chan int, pairCount)
+	for i := 0; i < len(almanac.Seeds); i += 2 {
+		start := almanac.Seeds[i]
+		end := start + almanac.Seeds[i+1]
+
+		go func(start, end int) {
+			var min *int
+			for j := start; j < end; j++ {
+				location := almanac.SeedLocation(j)
+				if min == nil || location < *min {
+					min = &location
+				}
+			}
+			minChan <- *min
+		}(start, end)
+	}
+
+	var min *int
+	for i := 0; i < pairCount; i++ {
+		m := <-minChan
+		if min == nil || m < *min {
+			min = &m
+		}
+	}
+
+	close(minChan)
+
+	result := strconv.Itoa(*min)
+	return result, nil
 }
