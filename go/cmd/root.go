@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"bufio"
 	"fmt"
 	"os"
 
@@ -11,7 +12,7 @@ import (
 	"github.com/spliner/aoc2023/pkg/day4"
 )
 
-type solver func(string) (string, error)
+type solver func(*bufio.Scanner) (string, error)
 
 func init() {
 	addCmd(1, day1.Part1, day1.Part2)
@@ -40,10 +41,14 @@ func addCmd(day int, part1, part2 solver) {
 		Short: fmt.Sprintf("Day %d solution", day),
 		Args:  cobra.ExactArgs(2),
 		RunE: func(_ *cobra.Command, args []string) error {
-			input, err := readInput(args[0])
+			readFile, err := os.Open(args[0])
 			if err != nil {
 				return err
 			}
+			defer readFile.Close()
+
+			scanner := bufio.NewScanner(readFile)
+			scanner.Split(bufio.ScanLines)
 
 			part := args[1]
 			switch part {
@@ -52,7 +57,7 @@ func addCmd(day int, part1, part2 solver) {
 					return fmt.Errorf("part 1 not yet implemented for day %d", day)
 				}
 
-				result, err := part1(input)
+				result, err := part1(scanner)
 				if err != nil {
 					return err
 				}
@@ -62,7 +67,7 @@ func addCmd(day int, part1, part2 solver) {
 					return fmt.Errorf("part 2 not yet implemented for day %d", day)
 				}
 
-				result, err := part2(input)
+				result, err := part2(scanner)
 				if err != nil {
 					return err
 				}
@@ -76,13 +81,4 @@ func addCmd(day int, part1, part2 solver) {
 	}
 
 	rootCmd.AddCommand(cmd)
-}
-
-func readInput(path string) (string, error) {
-	input, err := os.ReadFile(path)
-	if err != nil {
-		return "", err
-	}
-
-	return string(input), nil
 }

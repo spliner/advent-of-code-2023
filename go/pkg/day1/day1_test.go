@@ -1,7 +1,9 @@
 package day1
 
 import (
+	"bufio"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -47,8 +49,9 @@ func TestPart1(t *testing.T) {
 pqr3stu8vwx
 a1b2c3d4e5f
 treb7uchet`
+	scanner := bufio.NewScanner(strings.NewReader(input))
 
-	result, err := Part1(input)
+	result, err := Part1(scanner)
 
 	require.Nil(t, err)
 	assert.Equal(t, "142", result)
@@ -103,8 +106,9 @@ xtwone3four
 4nineeightseven2
 zoneight234
 7pqrstsixteen`
+	scanner := bufio.NewScanner(strings.NewReader(input))
 
-	result, err := Part2(input)
+	result, err := Part2(scanner)
 
 	require.Nil(t, err)
 	assert.Equal(t, "281", result)

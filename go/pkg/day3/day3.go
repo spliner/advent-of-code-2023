@@ -1,6 +1,7 @@
 package day3
 
 import (
+	"bufio"
 	"strconv"
 	"strings"
 	"unicode"
@@ -40,7 +41,7 @@ func (s *Schematic) IsPartNumber(number Number) bool {
 
 func (s *Schematic) IsSymbol(x, y int) bool {
 	coordinates := s.Coordinates
-	return x >= 0 && x < len(coordinates) && y >= 0 && y < len(coordinates) && coordinates[y][x].IsSymbol()
+	return y >= 0 && y < len(coordinates) && x >= 0 && x < len(coordinates[y]) && coordinates[y][x].IsSymbol()
 }
 
 func (s *Schematic) FindAdjacentPartNumbers(gear Point) []int {
@@ -88,8 +89,8 @@ type Number struct {
 	Value       int
 }
 
-func Part1(input string) (string, error) {
-	schematic, err := parseSchematic(input)
+func Part1(scanner *bufio.Scanner) (string, error) {
+	schematic, err := parseSchematic(scanner)
 	if err != nil {
 		return "", err
 	}
@@ -104,15 +105,15 @@ func Part1(input string) (string, error) {
 	return result, nil
 }
 
-func parseSchematic(input string) (*Schematic, error) {
-	lines := strings.Split(strings.TrimSpace(input), "\n")
-	coordinates := make([][]Coordinate, len(lines))
+func parseSchematic(scanner *bufio.Scanner) (*Schematic, error) {
+	coordinates := make([][]Coordinate, 0)
 	numbers := make([]Number, 0)
 	numberMap := make(map[Point]Number)
 	gearCandidates := make([]Point, 0)
-	for y, line := range lines {
-		line := strings.TrimSpace(line)
-		coordinates[y] = make([]Coordinate, len(line))
+	y := 0
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		coordinates = append(coordinates, make([]Coordinate, len(line)))
 
 		var currentNumber strings.Builder
 		currentNumberCoordinates := make([]Coordinate, 0)
@@ -162,6 +163,8 @@ func parseSchematic(input string) (*Schematic, error) {
 				numberMap[c.Point] = number
 			}
 		}
+
+		y++
 	}
 
 	schematic := Schematic{
@@ -174,8 +177,8 @@ func parseSchematic(input string) (*Schematic, error) {
 	return &schematic, nil
 }
 
-func Part2(input string) (string, error) {
-	schematic, err := parseSchematic(input)
+func Part2(scanner *bufio.Scanner) (string, error) {
+	schematic, err := parseSchematic(scanner)
 	if err != nil {
 		return "", err
 	}

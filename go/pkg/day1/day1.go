@@ -1,6 +1,7 @@
 package day1
 
 import (
+	"bufio"
 	"strconv"
 	"strings"
 	"unicode"
@@ -18,11 +19,10 @@ var replaces = map[string]rune{
 	"nine":  '9',
 }
 
-func Part1(input string) (string, error) {
-	lines := strings.Split(input, "\n")
+func Part1(scanner *bufio.Scanner) (string, error) {
 	var sum int
-	for _, l := range lines {
-		l := strings.TrimSpace(l)
+	for scanner.Scan() {
+		l := strings.TrimSpace(scanner.Text())
 		if l == "" {
 			continue
 		}
@@ -64,11 +64,10 @@ func parsePart1Calibration(input string) (int, error) {
 	return calibration, nil
 }
 
-func Part2(input string) (string, error) {
-	lines := strings.Split(input, "\n")
+func Part2(scanner *bufio.Scanner) (string, error) {
 	var sum int
-	for _, l := range lines {
-		l := strings.TrimSpace(l)
+	for scanner.Scan() {
+		l := strings.TrimSpace(scanner.Text())
 		if l == "" {
 			continue
 		}

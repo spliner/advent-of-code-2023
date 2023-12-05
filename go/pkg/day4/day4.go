@@ -1,6 +1,7 @@
 package day4
 
 import (
+	"bufio"
 	"errors"
 	"math"
 	"strconv"
@@ -33,11 +34,15 @@ func (c *Card) CountMatches() int {
 	return count
 }
 
-func Part1(input string) (string, error) {
-	lines := strings.Split(strings.TrimSpace(input), "\n")
+func Part1(scanner *bufio.Scanner) (string, error) {
 	var sum int
-	for _, l := range lines {
-		card, err := parseLine(strings.TrimSpace(l))
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" {
+			continue
+		}
+
+		card, err := parseLine(line)
 		if err != nil {
 			return "", err
 		}
@@ -111,28 +116,32 @@ func parseLine(line string) (*Card, error) {
 	return &card, nil
 }
 
-func Part2(input string) (string, error) {
-	lines := strings.Split(strings.TrimSpace(input), "\n")
-	quantities := make([]int, len(lines))
-	for i := range quantities {
-		quantities[i] = 1
-	}
+func Part2(scanner *bufio.Scanner) (string, error) {
+	cardCount := make(map[int]int, 0)
+	var i int
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" {
+			continue
+		}
 
-	for i, l := range lines {
-		card, err := parseLine(strings.TrimSpace(l))
+		cardCount[i] = cardCount[i] + 1
+		card, err := parseLine(line)
 		if err != nil {
 			return "", err
 		}
 
 		matches := card.CountMatches()
 		for j := 0; j < matches; j++ {
-			index := i + j + 1
-			quantities[index] = quantities[index] + quantities[i]
+			cardId := i + j + 1
+			cardCount[cardId] = cardCount[cardId] + cardCount[i]
 		}
+
+		i++
 	}
 
 	var sum int
-	for _, q := range quantities {
+	for _, q := range cardCount {
 		sum += q
 	}
 

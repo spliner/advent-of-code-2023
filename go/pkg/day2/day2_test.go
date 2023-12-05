@@ -1,6 +1,8 @@
 package day2
 
 import (
+	"bufio"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -40,8 +42,9 @@ Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green`
+	scanner := bufio.NewScanner(strings.NewReader(input))
 
-	result, err := Part1(input)
+	result, err := Part1(scanner)
 
 	require.Nil(t, err)
 	assert.Equal(t, "8", result)
@@ -77,8 +80,9 @@ Game 2: 1 blue, 2 green; 3 green, 4 blue, 1 red; 1 green, 1 blue
 Game 3: 8 green, 6 blue, 20 red; 5 blue, 4 red, 13 green; 5 green, 1 red
 Game 4: 1 green, 3 red, 6 blue; 3 green, 6 red; 3 green, 15 blue, 14 red
 Game 5: 6 red, 1 blue, 3 green; 2 blue, 1 red, 2 green`
+	scanner := bufio.NewScanner(strings.NewReader(input))
 
-	result, err := Part2(input)
+	result, err := Part2(scanner)
 
 	require.Nil(t, err)
 	assert.Equal(t, "2286", result)

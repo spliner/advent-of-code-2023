@@ -1,6 +1,7 @@
 package day2
 
 import (
+	"bufio"
 	"errors"
 	"strconv"
 	"strings"
@@ -33,8 +34,7 @@ func (g *Game) MinSubset() Subset {
 	return minSubset
 }
 
-func Part1(input string) (string, error) {
-	lines := strings.Split(strings.TrimSpace(input), "\n")
+func Part1(scanner *bufio.Scanner) (string, error) {
 	var sum int
 
 	subsetLimits := map[string]int{
@@ -44,8 +44,8 @@ func Part1(input string) (string, error) {
 	}
 
 gameLoop:
-	for _, l := range lines {
-		game, err := parseGame(l)
+	for scanner.Scan() {
+		game, err := parseGame(scanner.Text())
 		if err != nil {
 			return "", err
 		}
@@ -120,11 +120,10 @@ func parseGame(input string) (*Game, error) {
 	return NewGame(gameId, subsets), nil
 }
 
-func Part2(input string) (string, error) {
-	lines := strings.Split(strings.TrimSpace(input), "\n")
+func Part2(scanner *bufio.Scanner) (string, error) {
 	var sum int
-	for _, l := range lines {
-		game, err := parseGame(strings.TrimSpace(l))
+	for scanner.Scan() {
+		game, err := parseGame(strings.TrimSpace(scanner.Text()))
 		if err != nil {
 			return "", err
 		}

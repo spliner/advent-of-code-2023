@@ -1,6 +1,8 @@
 package day3
 
 import (
+	"bufio"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -18,8 +20,9 @@ func TestParseSchematic(t *testing.T) {
 ......755.
 ...$.*....
 .664.598..`
+	scanner := bufio.NewScanner(strings.NewReader(input))
 
-	schematic, err := parseSchematic(input)
+	schematic, err := parseSchematic(scanner)
 
 	require.Nil(t, err)
 
@@ -43,8 +46,9 @@ func TestPart1(t *testing.T) {
 ......755.
 ...$.*....
 .664.598..`
+	scanner := bufio.NewScanner(strings.NewReader(input))
 
-	result, err := Part1(input)
+	result, err := Part1(scanner)
 
 	require.Nil(t, err)
 	assert.Equal(t, "4361", result)
@@ -61,8 +65,9 @@ func TestPart2(t *testing.T) {
 ......755.
 ...$.*....
 .664.598..`
+	scanner := bufio.NewScanner(strings.NewReader(input))
 
-	result, err := Part2(input)
+	result, err := Part2(scanner)
 
 	require.Nil(t, err)
 	assert.Equal(t, "467835", result)
