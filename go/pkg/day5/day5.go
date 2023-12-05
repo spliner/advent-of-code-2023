@@ -54,26 +54,16 @@ func (m *Map) Destination(source int) int {
 }
 
 type Almanac struct {
-	SeedToSoilMap            *Map
-	SoilToFertilizerMap      *Map
-	FertilizerToWaterMap     *Map
-	WaterToLightMap          *Map
-	LightToTemperatureMap    *Map
-	TemperatureToHumidityMap *Map
-	HumidityToLocationMap    *Map
-	Seeds                    []int
+	Maps  []*Map
+	Seeds []int
 }
 
 func (a *Almanac) SeedLocation(seed int) int {
-	soil := a.SeedToSoilMap.Destination(seed)
-	fertilizer := a.SoilToFertilizerMap.Destination(soil)
-	water := a.FertilizerToWaterMap.Destination(fertilizer)
-	light := a.WaterToLightMap.Destination(water)
-	temperature := a.LightToTemperatureMap.Destination(light)
-	humidity := a.TemperatureToHumidityMap.Destination(temperature)
-	location := a.HumidityToLocationMap.Destination(humidity)
-
-	return location
+	dest := seed
+	for _, m := range a.Maps {
+		dest = m.Destination(dest)
+	}
+	return dest
 }
 
 func Part1(scanner *bufio.Scanner) (string, error) {
@@ -121,57 +111,24 @@ func parseAlmanac(scanner *bufio.Scanner) (*Almanac, error) {
 		seeds = append(seeds, val)
 	}
 
-	almanac := Almanac{
-		Seeds: seeds,
-	}
-
 	// Empty line
 	if !scanner.Scan() {
 		return nil, errors.New("could not read second input line")
 	}
 
-	seedToSoilMap, err := parseMap(scanner)
-	if err != nil {
-		return nil, err
+	maps := make([]*Map, 7)
+	for i := 0; i < 7; i++ {
+		m, err := parseMap(scanner)
+		if err != nil {
+			return nil, err
+		}
+		maps[i] = m
 	}
-	almanac.SeedToSoilMap = seedToSoilMap
 
-	soilToFertilizerMap, err := parseMap(scanner)
-	if err != nil {
-		return nil, err
+	almanac := Almanac{
+		Seeds: seeds,
+		Maps:  maps,
 	}
-	almanac.SoilToFertilizerMap = soilToFertilizerMap
-
-	fertilizerToWaterMap, err := parseMap(scanner)
-	if err != nil {
-		return nil, err
-	}
-	almanac.FertilizerToWaterMap = fertilizerToWaterMap
-
-	waterToLightMap, err := parseMap(scanner)
-	if err != nil {
-		return nil, err
-	}
-	almanac.WaterToLightMap = waterToLightMap
-
-	lightToTemperatureMap, err := parseMap(scanner)
-	if err != nil {
-		return nil, err
-	}
-	almanac.LightToTemperatureMap = lightToTemperatureMap
-
-	temperatureToHumidityMap, err := parseMap(scanner)
-	if err != nil {
-		return nil, err
-	}
-	almanac.TemperatureToHumidityMap = temperatureToHumidityMap
-
-	humidityToLocationMap, err := parseMap(scanner)
-	if err != nil {
-		return nil, err
-	}
-	almanac.HumidityToLocationMap = humidityToLocationMap
-
 	return &almanac, nil
 }
 
