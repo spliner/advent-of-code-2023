@@ -10,12 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestParseInput(t *testing.T) {
+func TestParsePart1Input(t *testing.T) {
 	input := `Time:      7  15   30
 Distance:  9  40  200`
 	scanner := bufio.NewScanner(strings.NewReader(input))
 
-	races, err := parseInput(scanner)
+	races, err := parsePart1Input(scanner)
 
 	require.Nil(t, err)
 	assert.Equal(t, 3, len(races))
@@ -62,4 +62,15 @@ Distance:  9  40  200`
 
 	require.Nil(t, err)
 	assert.Equal(t, "288", result)
+}
+
+func TestParsePart2Input(t *testing.T) {
+	input := `Time:      7  15   30
+Distance:  9  40  200`
+	scanner := bufio.NewScanner(strings.NewReader(input))
+
+	race, err := parsePart2Input(scanner)
+
+	require.Nil(t, err)
+	assert.Equal(t, Race{71530, 940200}, *race)
 }

@@ -15,22 +15,22 @@ type Race struct {
 }
 
 func Part1(scanner *bufio.Scanner) (string, error) {
-	races, err := parseInput(scanner)
+	races, err := parsePart1Input(scanner)
 	if err != nil {
 		return "", err
 	}
 
 	product := 1
 	for _, r := range races {
-		possibilities := foo(r)
-		product *= len(possibilities)
+		possibilities := countWinPossibilities(r)
+		product *= possibilities
 	}
 
 	result := strconv.Itoa(product)
 	return result, nil
 }
 
-func parseInput(scanner *bufio.Scanner) ([]*Race, error) {
+func parsePart1Input(scanner *bufio.Scanner) ([]*Race, error) {
 	if !scanner.Scan() {
 		return nil, errors.New("could not read first line")
 	}
@@ -86,17 +86,58 @@ func distanceTravelled(duration, timeHoldingButton int) int {
 	return timeHoldingButton*duration - int(math.Pow(float64(timeHoldingButton), 2))
 }
 
-func foo(race *Race) []int {
-	possibilities := make([]int, 0)
+func countWinPossibilities(race *Race) int {
+	var possibilities int
 	for i := 0; i <= race.Duration; i++ {
 		distance := distanceTravelled(race.Duration, i)
 		if distance > race.RecordDistance {
-			possibilities = append(possibilities, i)
+			possibilities++
 		}
 	}
 	return possibilities
 }
 
 func Part2(scanner *bufio.Scanner) (string, error) {
-	return "", nil
+	race, err := parsePart2Input(scanner)
+	if err != nil {
+		return "", err
+	}
+
+	possibilities := countWinPossibilities(race)
+	result := strconv.Itoa(possibilities)
+	return result, nil
+}
+
+func parsePart2Input(scanner *bufio.Scanner) (*Race, error) {
+	if !scanner.Scan() {
+		return nil, errors.New("could not read first line")
+	}
+	_, rawDuration, found := strings.Cut(strings.TrimSpace(scanner.Text()), ":")
+	if !found {
+		return nil, errors.New("could not find ':' in first line")
+	}
+	rawDuration = strings.ReplaceAll(rawDuration, " ", "")
+
+	if !scanner.Scan() {
+		return nil, errors.New("could not read second line")
+	}
+	_, rawRecord, found := strings.Cut(strings.TrimSpace(scanner.Text()), ":")
+	if !found {
+		return nil, errors.New("could not find ':' in second line")
+	}
+	rawRecord = strings.ReplaceAll(rawRecord, " ", "")
+	duration, err := strconv.Atoi(strings.TrimSpace(rawDuration))
+	if err != nil {
+		return nil, err
+	}
+	record, err := strconv.Atoi(strings.TrimSpace(rawRecord))
+	if err != nil {
+		return nil, err
+	}
+
+	race := &Race{
+		Duration:       duration,
+		RecordDistance: record,
+	}
+	return race, nil
 }
