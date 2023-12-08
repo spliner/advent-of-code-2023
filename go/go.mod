@@ -5,6 +5,7 @@ go 1.21.4
 require (
 	github.com/spf13/cobra v1.8.0
 	github.com/stretchr/testify v1.8.4
+	golang.org/x/exp v0.0.0-20231206192017-f3f8817b8deb
 )
 
 require (
