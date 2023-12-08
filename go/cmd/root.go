@@ -13,6 +13,7 @@ import (
 	"github.com/spliner/aoc2023/pkg/day5"
 	"github.com/spliner/aoc2023/pkg/day6"
 	"github.com/spliner/aoc2023/pkg/day7"
+	"github.com/spliner/aoc2023/pkg/day8"
 )
 
 type solver func(*bufio.Scanner) (string, error)
@@ -25,6 +26,7 @@ func init() {
 	addCmd(5, day5.Part1, day5.Part2)
 	addCmd(6, day6.Part1, day6.Part2)
 	addCmd(7, day7.Part1, day7.Part2)
+	addCmd(8, day8.Part1, day8.Part2)
 }
 
 var rootCmd = &cobra.Command{
