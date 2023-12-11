@@ -48,3 +48,14 @@ func (s *Set[T]) Contains(item T) bool {
 	_, ok := s.items[item]
 	return ok
 }
+
+func (s *Set[T]) All() []T {
+	slice := make([]T, len(s.items))
+	var i int
+	for k := range s.items {
+		slice[i] = k
+		i++
+	}
+
+	return slice
+}

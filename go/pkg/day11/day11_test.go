@@ -47,18 +47,16 @@ func TestExpand(t *testing.T) {
 	universe, err := parseUniverse(scanner)
 	require.Nil(t, err)
 
-	expanded := universe.Expand()
-	assert.Equal(t, 12, len(expanded.Map))
-	assert.Equal(t, 13, len(expanded.Map[0]))
-	assert.Equal(t, Point{4, 0}, expanded.Galaxies[0].Position)
-	assert.Equal(t, Point{9, 1}, expanded.Galaxies[1].Position)
-	assert.Equal(t, Point{0, 2}, expanded.Galaxies[2].Position)
-	assert.Equal(t, Point{8, 5}, expanded.Galaxies[3].Position)
-	assert.Equal(t, Point{1, 6}, expanded.Galaxies[4].Position)
-	assert.Equal(t, Point{12, 7}, expanded.Galaxies[5].Position)
-	assert.Equal(t, Point{9, 10}, expanded.Galaxies[6].Position)
-	assert.Equal(t, Point{0, 11}, expanded.Galaxies[7].Position)
-	assert.Equal(t, Point{5, 11}, expanded.Galaxies[8].Position)
+	expandedGalaxies := universe.Expand(2)
+	assert.Equal(t, Point{4, 0}, expandedGalaxies[0].Position)
+	assert.Equal(t, Point{9, 1}, expandedGalaxies[1].Position)
+	assert.Equal(t, Point{0, 2}, expandedGalaxies[2].Position)
+	assert.Equal(t, Point{8, 5}, expandedGalaxies[3].Position)
+	assert.Equal(t, Point{1, 6}, expandedGalaxies[4].Position)
+	assert.Equal(t, Point{12, 7}, expandedGalaxies[5].Position)
+	assert.Equal(t, Point{9, 10}, expandedGalaxies[6].Position)
+	assert.Equal(t, Point{0, 11}, expandedGalaxies[7].Position)
+	assert.Equal(t, Point{5, 11}, expandedGalaxies[8].Position)
 }
 
 func TestPart1(t *testing.T) {
@@ -78,4 +76,37 @@ func TestPart1(t *testing.T) {
 
 	require.Nil(t, err)
 	assert.Equal(t, "374", result)
+}
+
+func TestRun(t *testing.T) {
+	input := `...#......
+.......#..
+#.........
+..........
+......#...
+.#........
+.........#
+..........
+.......#..
+#...#.....`
+	type testCase struct {
+		expandTimes    int
+		expectedResult string
+	}
+	testCases := []testCase{
+		{2, "374"},
+		{10, "1030"},
+		{100, "8410"},
+	}
+	for _, c := range testCases {
+		name := fmt.Sprintf("expanding %d times should return %s", c.expandTimes, c.expectedResult)
+		t.Run(name, func(t *testing.T) {
+			scanner := bufio.NewScanner(strings.NewReader(input))
+
+			result, err := run(scanner, c.expandTimes)
+
+			require.Nil(t, err)
+			assert.Equal(t, c.expectedResult, result)
+		})
+	}
 }

@@ -28,63 +28,41 @@ type Universe struct {
 	Galaxies []Galaxy
 }
 
-func (u *Universe) Expand() *Universe {
-	emptyColumns, emptyRows := emptyIndexes(u)
+func (u *Universe) Expand(expandTimes int) []Galaxy {
+	expandTimes = expandTimes - 1
 
-	oldHeight := len(u.Map)
-	oldWidth := len(u.Map[0])
-	newHeight := oldHeight + emptyRows.Length()
-	newWidth := oldWidth + emptyColumns.Length()
-
-	galaxies := make([]Galaxy, len(u.Galaxies))
-	var galaxyIndex int
-
-	newMap := make([][]rune, newHeight)
-	var oldY, y int
-	for y < newHeight {
-		if emptyRows.Contains(oldY) {
-			newMap[y] = make([]rune, newWidth)
-			newMap[y+1] = make([]rune, newWidth)
-			for x := 0; x < newWidth; x++ {
-				val := '.'
-				newMap[y][x] = val
-				newMap[y+1][x] = val
+	expandedGalaxies := make([]Galaxy, len(u.Galaxies))
+	emptyColumnSet, emptyRowSet := u.emptyIndexes()
+	emptyColumns := emptyColumnSet.All()
+	emptyRows := emptyRowSet.All()
+	for i, g := range u.Galaxies {
+		x := g.Position.X
+		var columnCount int
+		for _, c := range emptyColumns {
+			if c < x {
+				columnCount++
 			}
+		}
+		x += columnCount * expandTimes
 
-			y++
-		} else {
-			var oldX, x int
-			row := make([]rune, newWidth)
-			for x < newWidth {
-				if emptyColumns.Contains(oldX) {
-					row[x] = '.'
-					x++
-					row[x] = '.'
-				} else {
-					val := u.Map[oldY][oldX]
-					row[x] = val
-					if val == '#' {
-						position := Point{x, y}
-						galaxies[galaxyIndex] = Galaxy{position}
-						galaxyIndex++
-					}
-				}
-
-				x++
-				oldX++
+		y := g.Position.Y
+		var rowCount int
+		for _, c := range emptyRows {
+			if c < y {
+				rowCount++
 			}
-
-			newMap[y] = row
 		}
 
-		oldY++
-		y++
+		y += rowCount * expandTimes
+
+		position := Point{x, y}
+		expandedGalaxies[i] = Galaxy{position}
 	}
 
-	return &Universe{newMap, galaxies}
+	return expandedGalaxies
 }
 
-func emptyIndexes(u *Universe) (emtptyColumns, emptyRows *set.Set[int]) {
+func (u *Universe) emptyIndexes() (emtptyColumns, emptyRows *set.Set[int]) {
 	emtptyColumns = set.New[int]()
 	emptyRows = set.New[int]()
 
@@ -122,17 +100,21 @@ func emptyIndexes(u *Universe) (emtptyColumns, emptyRows *set.Set[int]) {
 }
 
 func Part1(scanner *bufio.Scanner) (string, error) {
+	return run(scanner, 2)
+}
+
+func run(scanner *bufio.Scanner, expandTimes int) (string, error) {
 	universe, err := parseUniverse(scanner)
 	if err != nil {
 		return "", nil
 	}
 
-	expandedUniverse := universe.Expand()
+	expandedGalaxies := universe.Expand(expandTimes)
 	var sum int
-	for i := 0; i < len(expandedUniverse.Galaxies); i++ {
-		for j := i + 1; j < len(expandedUniverse.Galaxies); j++ {
-			gX := expandedUniverse.Galaxies[i]
-			gY := expandedUniverse.Galaxies[j]
+	for i := 0; i < len(expandedGalaxies); i++ {
+		for j := i + 1; j < len(expandedGalaxies); j++ {
+			gX := expandedGalaxies[i]
+			gY := expandedGalaxies[j]
 
 			distance := gX.Position.Distance(gY.Position)
 
@@ -174,5 +156,5 @@ func parseUniverse(scanner *bufio.Scanner) (*Universe, error) {
 }
 
 func Part2(scanner *bufio.Scanner) (string, error) {
-	return "", nil
+	return run(scanner, 1_000_000)
 }
