@@ -123,40 +123,72 @@ func Part2(scanner *bufio.Scanner) (string, error) {
 
 	loop := findLoop(m)
 	loop[m.Start] = 0
-	var count int
 	validPositions := make([]Position, 0)
-	for y, line := range m.Tiles {
-		var foundStart bool
-		var currentCount int
-		positions := make([]Position, 0)
-		for x := range line {
-			position := Position{x, y}
-			if _, ok := loop[position]; ok {
-				if foundStart {
-					for _, p := range positions {
-						validPositions = append(validPositions, p)
+	for y := 1; y < len(m.Tiles); y++ {
+		var wallCount int
+		var lastBend rune
+		for x := 1; x < len(m.Tiles[y]); x++ {
+			tile := m.Tiles[y][x]
+			if _, ok := loop[tile.Position]; ok {
+				switch tile.Value {
+				case '|':
+					wallCount++
+					lastBend = 0
+				case 'L', 'F':
+					lastBend = tile.Value
+				case 'J':
+					if lastBend == 'F' {
+						wallCount++
 					}
-					positions = make([]Position, 0)
-					count += currentCount
-					currentCount = 0
-					foundStart = false
-				} else {
-					foundStart = true
-					continue
+					lastBend = 0
+				case '7':
+					if lastBend == 'L' {
+						wallCount++
+					}
+					lastBend = 0
 				}
-			}
-
-			if foundStart {
-				positions = append(positions, Position{position.X, position.Y})
-				currentCount++
+			} else {
+				lastBend = 0
+				if wallCount%2 == 1 {
+					validPositions = append(validPositions, tile.Position)
+				}
 			}
 		}
 	}
 
-	fmt.Println(validPositions)
-
-	result := strconv.Itoa(count)
+	result := strconv.Itoa(len(validPositions))
 	return result, nil
+}
+
+func printMap(m *Map, validPositions []Position) {
+	loop := findLoop(m)
+	loop[m.Start] = 0
+
+	var sb strings.Builder
+	for y := 0; y < len(m.Tiles); y++ {
+		line := m.Tiles[y]
+		for x := 0; x < len(line); x++ {
+			tile := m.Tiles[y][x]
+			val := tile.Value
+			_, ok := loop[tile.Position]
+			if !ok {
+				for _, p := range validPositions {
+					if p == tile.Position {
+						val = 'I'
+						break
+					} else {
+						val = 'O'
+					}
+				}
+			}
+			if x == 0 || y == 0 || x == len(m.Tiles[y])-1 || y == len(m.Tiles)-1 {
+				val = '.'
+			}
+			sb.WriteRune(val)
+		}
+		sb.WriteString("\n")
+	}
+	fmt.Println(sb.String())
 }
 
 func findLoop(m *Map) map[Position]int {
