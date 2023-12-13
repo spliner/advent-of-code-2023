@@ -1,10 +1,13 @@
 package day12
 
 import (
+	"bufio"
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
 func TestValidArrangement(t *testing.T) {
@@ -102,4 +105,30 @@ func TestValidArrangements(t *testing.T) {
 			assert.Equal(t, c.expected, len(validArrangements))
 		})
 	}
+}
+
+func TestRowExpand(t *testing.T) {
+	record := Record{"???.###", []int{1, 1, 3}}
+	expected := Record{"???.###????.###????.###????.###????.###", []int{1, 1, 3, 1, 1, 3, 1, 1, 3, 1, 1, 3, 1, 1, 3}}
+
+	expanded := record.Expand(5)
+
+	assert.Equal(t, expected, expanded)
+}
+
+func TestPart2(t *testing.T) {
+	// 	input := `???.### 1,1,3
+	// .??..??...?##. 1,1,3
+	// ?#?#?#?#?#?#?#? 1,3,1,6
+	// ????.#...#... 4,1,1
+	// ????.######..#####. 1,6,5
+	// ?###???????? 3,2,1`
+	// input := "???.### 1,1,3"
+	input := ".??..??...?##. 1,1,3"
+	scanner := bufio.NewScanner(strings.NewReader(input))
+
+	result, err := Part2(scanner)
+
+	require.Nil(t, err)
+	assert.Equal(t, "525152", result)
 }

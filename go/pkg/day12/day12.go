@@ -13,6 +13,22 @@ type Record struct {
 	DamagedSprings []int
 }
 
+func (r Record) Expand(times int) Record {
+	var line strings.Builder
+	damagedSprings := make([]int, 0)
+
+	for i := 0; i < times; i++ {
+		line.WriteString(r.Line)
+		if i < times-1 {
+			line.WriteRune('?')
+		}
+		damagedSprings = append(damagedSprings, r.DamagedSprings...)
+	}
+
+	expanded := Record{line.String(), damagedSprings}
+	return expanded
+}
+
 func Part1(scanner *bufio.Scanner) (string, error) {
 	records, err := parseRecords(scanner)
 	if err != nil {
@@ -61,20 +77,27 @@ func parseRecords(scanner *bufio.Scanner) ([]Record, error) {
 	return records, nil
 }
 
-func validArrangements(r *Record) []string {
-	arrangements := possibleArrangements(r.Line)
+func validArrangements(record *Record) []string {
+	line := record.Line
+	arrangements := possibleArrangements(line)
 	validArrangements := make([]string, 0)
 	for _, a := range arrangements {
-		if validArrangement(a, r.DamagedSprings) {
+		if validArrangement(a, record.DamagedSprings) {
 			validArrangements = append(validArrangements, a)
 		}
 	}
 	return validArrangements
 }
 
+type unknownGroup struct {
+	startIndex int
+	val        string
+}
+
 func possibleArrangements(line string) []string {
 	// Maps start index -> group
-	unknownGroups := make(map[int]string)
+	unknownGroups := make([]unknownGroup, 0)
+	g := unknownGroup{}
 	var currentGroup strings.Builder
 	index := -1
 	for i, r := range line {
@@ -86,30 +109,35 @@ func possibleArrangements(line string) []string {
 		}
 		if r != '?' || i == len(line)-1 {
 			if index != -1 {
-				unknownGroups[index] = currentGroup.String()
+				g.startIndex = index
+				g.val = currentGroup.String()
+				unknownGroups = append(unknownGroups, g)
 			}
+			g = unknownGroup{}
 			currentGroup.Reset()
 			index = -1
 		}
 	}
-
 	arrangements := []string{line}
-	for startIndex, group := range unknownGroups {
+	for _, group := range unknownGroups {
 		arrangementsToReplace := make([]string, 0)
+		start, end := -1, -1
 		for i := 0; i < len(arrangements); i++ {
 			a := arrangements[i]
-			if a[startIndex] == '?' {
+			if a[group.startIndex] == '?' {
+				if start == -1 {
+					start = i
+				}
+				end = i
 				arrangementsToReplace = append(arrangementsToReplace, a)
-				arrangements = append(arrangements[:i], arrangements[i+1:]...)
-				i--
 			}
 		}
+		arrangements = append(arrangements[:start], arrangements[end+1:]...)
 
-		groupedArrangements := groupArrangements(group)
-		endIndex := startIndex + len(group)
+		groupedArrangements := groupArrangements(group.val)
 		for _, r := range arrangementsToReplace {
 			for _, a := range groupedArrangements {
-				arrangement := r[0:startIndex] + a + r[endIndex:]
+				arrangement := strings.Replace(r, group.val, a, 1)
 				arrangements = append(arrangements, arrangement)
 			}
 		}
@@ -118,7 +146,17 @@ func possibleArrangements(line string) []string {
 	return arrangements
 }
 
+var cache = map[string][]string{
+	"?":   {".", "#"},
+	"??":  {"..", ".#", "#.", "##"},
+	"???": {"...", "..#", ".#.", ".##", "#..", "#.#", "##.", "###"},
+}
+
 func groupArrangements(s string) []string {
+	if val, ok := cache[s]; ok {
+		return val
+	}
+
 	if len(s) == 1 {
 		return []string{".", "#"}
 	}
@@ -141,11 +179,17 @@ func groupArrangements(s string) []string {
 		idx := i % half
 		results[i] = results[i] + f[idx]
 	}
+	cache[s] = results
 	return results
 }
 
+var groupCountMemo map[string][]int = make(map[string][]int)
+
 func validArrangement(arrangement string, damagedGroups []int) bool {
-	groupCounts := make([]int, 0)
+	groupCounts := groupCountMemo[arrangement]
+	if groupCounts == nil {
+		groupCounts = make([]int, 0, len(arrangement))
+	}
 	var currentCount int
 	for _, r := range arrangement {
 		if r == '#' {
@@ -155,6 +199,8 @@ func validArrangement(arrangement string, damagedGroups []int) bool {
 			currentCount = 0
 		}
 	}
+
+	groupCountMemo[arrangement] = groupCounts
 	if currentCount > 0 {
 		groupCounts = append(groupCounts, currentCount)
 	}
@@ -176,5 +222,17 @@ func validArrangement(arrangement string, damagedGroups []int) bool {
 }
 
 func Part2(scanner *bufio.Scanner) (string, error) {
-	return "", nil
+	records, err := parseRecords(scanner)
+	if err != nil {
+		return "", err
+	}
+
+	var sum int
+	for _, r := range records {
+		expanded := r.Expand(5)
+		validArrangements := validArrangements(&expanded)
+		sum += len(validArrangements)
+	}
+	result := strconv.Itoa(sum)
+	return result, nil
 }
