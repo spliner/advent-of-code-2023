@@ -31,8 +31,7 @@ type Beam struct {
 type Tile rune
 
 type Grid struct {
-	Tiles              [][]Tile
-	EnergizedPositions *set.Set[Point]
+	Tiles [][]Tile
 }
 
 func (g *Grid) IsInBounds(p Point) bool {
@@ -45,9 +44,15 @@ func Part1(scanner *bufio.Scanner) (string, error) {
 		return "", err
 	}
 
-	point := Point{0, 0}
+	positions := walk(grid, Point{0, 0}, East)
+	result := strconv.Itoa(positions)
+	return result, nil
+}
+
+func walk(grid *Grid, startPosition Point, startDirection Direction) int {
+	energizedPositions := set.New[Point]()
 	beams := []*Beam{
-		{point, East},
+		{startPosition, startDirection},
 	}
 	beamDirectionHistory := make(map[Point]*set.Set[Direction])
 	for len(beams) > 0 {
@@ -64,7 +69,7 @@ func Part1(scanner *bufio.Scanner) (string, error) {
 			continue
 		}
 
-		grid.EnergizedPositions.Add(beam.Position)
+		energizedPositions.Add(beam.Position)
 
 		beamDirectionHistory[beam.Position].Add(beam.Direction)
 
@@ -109,8 +114,7 @@ func Part1(scanner *bufio.Scanner) (string, error) {
 		beam.Position = nextPoint(beam.Position, beam.Direction)
 	}
 
-	result := strconv.Itoa(grid.EnergizedPositions.Length())
-	return result, nil
+	return energizedPositions.Length()
 }
 
 func print(grid *Grid, beams []*Beam) {
@@ -176,9 +180,48 @@ func parseGrid(scanner *bufio.Scanner) (*Grid, error) {
 		y++
 	}
 
-	return &Grid{grid, set.New[Point]()}, nil
+	return &Grid{grid}, nil
 }
 
 func Part2(scanner *bufio.Scanner) (string, error) {
-	return "", nil
+	grid, err := parseGrid(scanner)
+	if err != nil {
+		return "", err
+	}
+
+	height := len(grid.Tiles)
+	width := len(grid.Tiles[0])
+
+	var maxCount int
+	for x := 0; x < width; x++ {
+		startPoint := Point{x, 0}
+		count := walk(grid, startPoint, South)
+		if count > maxCount {
+			maxCount = count
+		}
+
+		startPoint = Point{x, height - 1}
+		count = walk(grid, startPoint, North)
+		if count > maxCount {
+			maxCount = count
+		}
+	}
+
+	for y := 0; y < height; y++ {
+		startPoint := Point{0, y}
+		count := walk(grid, startPoint, East)
+		if count > maxCount {
+			maxCount = count
+		}
+
+		startPoint = Point{width - 1, y}
+
+		count = walk(grid, startPoint, West)
+		if count > maxCount {
+			maxCount = count
+		}
+	}
+
+	result := strconv.Itoa(maxCount)
+	return result, nil
 }

@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestPart(t *testing.T) {
+func TestPart1(t *testing.T) {
 	input := `.|...\....
 |.-.\.....
 .....|-...
@@ -26,4 +26,23 @@ func TestPart(t *testing.T) {
 
 	require.Nil(t, err)
 	assert.Equal(t, "46", result)
+}
+
+func TestPart2(t *testing.T) {
+	input := `.|...\....
+|.-.\.....
+.....|-...
+........|.
+..........
+.........\
+..../.\\..
+.-.-/..|..
+.|....-|.\
+..//.|....`
+	scanner := bufio.NewScanner(strings.NewReader(input))
+
+	result, err := Part2(scanner)
+
+	require.Nil(t, err)
+	assert.Equal(t, "51", result)
 }
