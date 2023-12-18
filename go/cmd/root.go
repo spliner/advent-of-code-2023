@@ -14,6 +14,7 @@ import (
 	"github.com/spliner/aoc2023/pkg/day14"
 	"github.com/spliner/aoc2023/pkg/day15"
 	"github.com/spliner/aoc2023/pkg/day16"
+	"github.com/spliner/aoc2023/pkg/day18"
 	"github.com/spliner/aoc2023/pkg/day2"
 	"github.com/spliner/aoc2023/pkg/day3"
 	"github.com/spliner/aoc2023/pkg/day4"
@@ -43,6 +44,7 @@ func init() {
 	addCmd(14, day14.Part1, day14.Part2)
 	addCmd(15, day15.Part1, day15.Part2)
 	addCmd(16, day16.Part1, day16.Part2)
+	addCmd(18, day18.Part1, day18.Part2)
 }
 
 var rootCmd = &cobra.Command{
